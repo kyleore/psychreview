@@ -72,10 +72,61 @@
         .prose-ai ul{list-style:disc;margin-left:1.1rem;margin-bottom:.6rem}
         .prose-ai p{margin-bottom:.6rem}
         .prose-ai strong{color:#4338ca}
+        /* Skeleton loading */
+        .skeleton{position:relative;overflow:hidden;background:#e2e8f0;border-radius:.75rem}
+        .skeleton::after{content:'';position:absolute;inset:0;transform:translateX(-100%);
+            background:linear-gradient(90deg,transparent,rgba(255,255,255,.65),transparent);
+            animation:skeleton-shimmer 1.4s infinite}
+        @keyframes skeleton-shimmer{100%{transform:translateX(100%)}}
+        /* Top navigation progress bar */
+        #nav-progress{position:fixed;top:0;left:0;height:3px;width:0;z-index:70;opacity:0;
+            background:linear-gradient(90deg,#4f46e5,#8b5cf6,#6366f1);
+            box-shadow:0 0 10px rgba(99,102,241,.7);transition:width .25s ease,opacity .25s ease}
+        #nav-progress.active{opacity:1}
+        /* Full-page navigation skeleton */
+        #page-skeleton{position:fixed;inset:0;z-index:65;background:#f8fafc;display:none;overflow:hidden}
+        #page-skeleton.show{display:block;animation:fade-in .2s ease-out both}
     </style>
     @stack('head')
 </head>
 <body class="min-h-screen font-sans text-slate-800 antialiased">
+
+    <!-- Navigation loading indicators -->
+    <div id="nav-progress"></div>
+    <div id="page-skeleton" aria-hidden="true">
+        <div class="h-14 border-b border-slate-200 bg-white"></div>
+        <div class="mx-auto max-w-6xl px-4 py-8">
+            <div class="skeleton h-9 w-2/3 max-w-sm"></div>
+            <div class="skeleton mt-3 h-4 w-1/2 max-w-xs"></div>
+            <div class="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+                <div class="rounded-3xl border border-slate-100 bg-white p-6">
+                    <div class="skeleton h-12 w-12 rounded-2xl"></div>
+                    <div class="skeleton mt-5 h-5 w-3/4"></div>
+                    <div class="skeleton mt-3 h-3 w-1/2"></div>
+                </div>
+                <div class="rounded-3xl border border-slate-100 bg-white p-6">
+                    <div class="skeleton h-12 w-12 rounded-2xl"></div>
+                    <div class="skeleton mt-5 h-5 w-3/4"></div>
+                    <div class="skeleton mt-3 h-3 w-1/2"></div>
+                </div>
+                <div class="rounded-3xl border border-slate-100 bg-white p-6">
+                    <div class="skeleton h-12 w-12 rounded-2xl"></div>
+                    <div class="skeleton mt-5 h-5 w-3/4"></div>
+                    <div class="skeleton mt-3 h-3 w-1/2"></div>
+                </div>
+                <div class="rounded-3xl border border-slate-100 bg-white p-6">
+                    <div class="skeleton h-12 w-12 rounded-2xl"></div>
+                    <div class="skeleton mt-5 h-5 w-3/4"></div>
+                    <div class="skeleton mt-3 h-3 w-1/2"></div>
+                </div>
+            </div>
+            <div class="mt-10 space-y-4">
+                <div class="skeleton h-20 w-full rounded-2xl"></div>
+                <div class="skeleton h-20 w-full rounded-2xl"></div>
+                <div class="skeleton h-20 w-full rounded-2xl"></div>
+            </div>
+        </div>
+    </div>
 
     <header class="sticky top-0 z-40 border-b border-slate-200/70 bg-white/80 backdrop-blur-lg">
         <div class="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
@@ -194,6 +245,58 @@
         function renderIcons(){ if (window.lucide) lucide.createIcons(); }
         document.addEventListener('DOMContentLoaded', renderIcons);
         document.addEventListener('alpine:initialized', renderIcons);
+
+        // Navigation loading: top progress bar + skeleton screen for slow page loads.
+        (function () {
+            const bar = document.getElementById('nav-progress');
+            const skel = document.getElementById('page-skeleton');
+            let trickle, skelTimer, running = false;
+
+            function start() {
+                if (running) return;
+                running = true;
+                bar.classList.add('active');
+                bar.style.width = '8%';
+                requestAnimationFrame(() => { bar.style.width = '40%'; });
+                let w = 40;
+                trickle = setInterval(() => {
+                    w = Math.min(w + Math.random() * 8, 90);
+                    bar.style.width = w + '%';
+                }, 400);
+                // Only reveal the skeleton if the page is genuinely slow (e.g. cold start).
+                skelTimer = setTimeout(() => skel.classList.add('show'), 350);
+            }
+
+            function done() {
+                clearInterval(trickle);
+                clearTimeout(skelTimer);
+                running = false;
+                bar.style.width = '100%';
+                setTimeout(() => { bar.classList.remove('active'); bar.style.width = '0'; }, 250);
+                skel.classList.remove('show');
+            }
+
+            document.addEventListener('click', function (e) {
+                const a = e.target.closest('a');
+                if (!a) return;
+                if (a.target === '_blank' || a.hasAttribute('download') || a.hasAttribute('data-no-skeleton')) return;
+                if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+                const href = a.getAttribute('href');
+                if (!href || href.startsWith('#') || /^(mailto:|tel:|javascript:)/i.test(href)) return;
+                if (a.origin !== location.origin) return;
+                if (a.pathname === location.pathname && a.hash) return;
+                start();
+            });
+
+            document.addEventListener('submit', function (e) {
+                const f = e.target;
+                if (e.defaultPrevented || f.hasAttribute('data-no-skeleton')) return;
+                start();
+            });
+
+            // Reset when the page is shown (including back/forward cache restores).
+            window.addEventListener('pageshow', done);
+        })();
 
         // Lightweight, safe Markdown-lite -> HTML (escapes input first)
         function mdToHtml(md){

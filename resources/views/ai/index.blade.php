@@ -69,10 +69,11 @@
 
                     <div x-show="loading" class="flex gap-3">
                         <span class="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-brand-100 text-brand-600"><i data-lucide="bot" class="h-4 w-4"></i></span>
-                        <div class="flex items-center gap-1.5 rounded-2xl rounded-tl-sm bg-slate-50 px-4 py-3.5">
-                            <span class="h-2 w-2 animate-bounce rounded-full bg-brand-400" style="animation-delay:0s"></span>
-                            <span class="h-2 w-2 animate-bounce rounded-full bg-brand-400" style="animation-delay:.15s"></span>
-                            <span class="h-2 w-2 animate-bounce rounded-full bg-brand-400" style="animation-delay:.3s"></span>
+                        <div class="w-full max-w-[85%] space-y-2.5 rounded-2xl rounded-tl-sm bg-slate-50 px-4 py-3.5">
+                            <div class="skeleton h-3 w-3/4"></div>
+                            <div class="skeleton h-3 w-full"></div>
+                            <div class="skeleton h-3 w-5/6"></div>
+                            <div class="skeleton h-3 w-2/3"></div>
                         </div>
                     </div>
                 </div>

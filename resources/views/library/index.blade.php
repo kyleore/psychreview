@@ -77,6 +77,24 @@
                                 </button>
                             </div>
 
+                            <!-- Loading skeleton -->
+                            <div x-cloak x-show="isLoading({{ $topic['id'] }})" class="mt-3 space-y-3 border-t border-slate-200 pt-3">
+                                <div class="flex items-start gap-2">
+                                    <div class="skeleton h-4 w-4 shrink-0 rounded"></div>
+                                    <div class="min-w-0 flex-1 space-y-1.5">
+                                        <div class="skeleton h-3.5 w-2/3"></div>
+                                        <div class="skeleton h-3 w-full"></div>
+                                    </div>
+                                </div>
+                                <div class="flex items-start gap-2">
+                                    <div class="skeleton h-4 w-4 shrink-0 rounded"></div>
+                                    <div class="min-w-0 flex-1 space-y-1.5">
+                                        <div class="skeleton h-3.5 w-1/2"></div>
+                                        <div class="skeleton h-3 w-5/6"></div>
+                                    </div>
+                                </div>
+                            </div>
+
                             <!-- Results panel -->
                             <div x-cloak x-show="results[{{ $topic['id'] }}]" x-transition class="mt-3 border-t border-slate-200 pt-3">
                                 <template x-if="results[{{ $topic['id'] }}] && results[{{ $topic['id'] }}].resources.length">

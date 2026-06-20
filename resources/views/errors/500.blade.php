@@ -1,0 +1,13 @@
+@extends('errors.layout')
+
+@section('title', 'Server error')
+@section('code', 'Error 500')
+@section('heading', 'Something went wrong')
+@section('icon')
+<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z"/></svg>
+@endsection
+@section('message', 'We hit an unexpected problem on our end. Please try again in a moment.')
+
+@section('actions')
+    <button onclick="location.reload()" class="btn btn-primary">Try again</button>
+@endsection

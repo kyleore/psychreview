@@ -138,6 +138,7 @@
             </a>
 
             <div class="flex items-center gap-4">
+                @auth
                 <nav class="hidden items-center gap-7 text-sm font-semibold text-slate-600 md:flex">
                     @php $r = Route::currentRouteName(); @endphp
                     <a href="{{ route('home') }}" class="nav-link inline-flex items-center gap-1.5 {{ $r==='home'?'active text-brand-700':'' }}"><i data-lucide="home" class="h-4 w-4"></i> Home</a>
@@ -150,6 +151,7 @@
                         <i data-lucide="sparkles" class="h-4 w-4"></i> AI Tutor
                     </a>
                 </nav>
+                @endauth
 
                 <div class="flex items-center gap-2 text-sm font-semibold">
                     @auth
@@ -176,7 +178,7 @@
         </div>
     </header>
 
-    <main class="pb-20 md:pb-0">
+    <main class="{{ auth()->check() ? 'pb-20 md:pb-0' : '' }}">
         @if (session('status'))
             <div class="mx-auto max-w-6xl px-4 pt-4">
                 <div class="flex items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700">
@@ -189,6 +191,7 @@
     </main>
 
     <!-- Facebook-style sticky bottom nav (mobile only) -->
+    @auth
     <nav class="fixed inset-x-0 bottom-0 z-50 border-t border-slate-200 bg-white/95 backdrop-blur-lg shadow-[0_-4px_20px_-8px_rgba(0,0,0,0.15)] md:hidden">
         @php $r = Route::currentRouteName(); @endphp
         <div class="mx-auto grid max-w-lg grid-cols-7">
@@ -215,6 +218,7 @@
             </a>
         </div>
     </nav>
+    @endauth
 
     <footer class="mt-16 border-t border-slate-200 bg-white/70 pb-20 md:pb-0">
         <div class="mx-auto max-w-6xl px-4 py-10">

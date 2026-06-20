@@ -10,23 +10,31 @@ use App\Http\Controllers\QuizController;
 use App\Http\Controllers\TopicController;
 use Illuminate\Support\Facades\Route;
 
+// Public entry point: intro/landing for guests, dashboard for logged-in users.
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
-Route::get('/topics', [TopicController::class, 'index'])->name('topics.index');
-Route::get('/topics/{topic:slug}', [TopicController::class, 'show'])->name('topics.show');
+// The app itself requires an account.
+Route::middleware('auth')->group(function () {
+    // First-run feature walkthrough for new users.
+    Route::get('/welcome', [HomeController::class, 'intro'])->name('intro');
+    Route::post('/welcome/done', [HomeController::class, 'finishIntro'])->name('intro.done');
 
-Route::get('/flashcards', [FlashcardController::class, 'index'])->name('flashcards.index');
+    Route::get('/topics', [TopicController::class, 'index'])->name('topics.index');
+    Route::get('/topics/{topic:slug}', [TopicController::class, 'show'])->name('topics.show');
 
-Route::get('/quiz', [QuizController::class, 'index'])->name('quiz.index');
-Route::post('/quiz', [QuizController::class, 'submit'])->name('quiz.submit');
+    Route::get('/flashcards', [FlashcardController::class, 'index'])->name('flashcards.index');
 
-Route::get('/progress', [ProgressController::class, 'index'])->name('progress.index');
+    Route::get('/quiz', [QuizController::class, 'index'])->name('quiz.index');
+    Route::post('/quiz', [QuizController::class, 'submit'])->name('quiz.submit');
 
-Route::get('/library', [LibraryController::class, 'index'])->name('library.index');
-Route::post('/library/find-pdfs', [LibraryController::class, 'findPdfs'])->name('library.find');
+    Route::get('/progress', [ProgressController::class, 'index'])->name('progress.index');
 
-Route::get('/ai-tutor', [AiController::class, 'index'])->name('ai.index');
-Route::post('/ai-tutor/explain', [AiController::class, 'explain'])->name('ai.explain');
+    Route::get('/library', [LibraryController::class, 'index'])->name('library.index');
+    Route::post('/library/find-pdfs', [LibraryController::class, 'findPdfs'])->name('library.find');
+
+    Route::get('/ai-tutor', [AiController::class, 'index'])->name('ai.index');
+    Route::post('/ai-tutor/explain', [AiController::class, 'explain'])->name('ai.explain');
+});
 
 // Authentication
 Route::middleware('guest')->group(function () {

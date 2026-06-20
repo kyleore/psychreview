@@ -31,8 +31,7 @@ class AuthController extends Controller
         Auth::login($user);
         $request->session()->regenerate();
 
-        return redirect()->route('home')
-            ->with('status', 'Welcome, '.$user->name.'! Your account is ready.');
+        return redirect()->route('intro');
     }
 
     public function showLogin()
@@ -54,6 +53,11 @@ class AuthController extends Controller
         }
 
         $request->session()->regenerate();
+
+        // New users see the feature walkthrough before anything else.
+        if (is_null($request->user()->onboarded_at)) {
+            return redirect()->route('intro');
+        }
 
         return redirect()->intended(route('home'))->with('status', 'Welcome back!');
     }

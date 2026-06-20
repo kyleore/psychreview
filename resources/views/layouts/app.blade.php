@@ -86,22 +86,51 @@
                 <span class="text-lg font-extrabold tracking-tight text-slate-900">Psych<span class="text-brand-600">Review</span></span>
             </a>
 
-            <nav class="hidden items-center gap-7 text-sm font-semibold text-slate-600 md:flex">
-                @php $r = Route::currentRouteName(); @endphp
-                <a href="{{ route('home') }}" class="nav-link inline-flex items-center gap-1.5 {{ $r==='home'?'active text-brand-700':'' }}"><i data-lucide="home" class="h-4 w-4"></i> Home</a>
-                <a href="{{ route('topics.index') }}" class="nav-link inline-flex items-center gap-1.5 {{ str_starts_with($r,'topics')?'active text-brand-700':'' }}"><i data-lucide="book-open" class="h-4 w-4"></i> Topics</a>
-                <a href="{{ route('flashcards.index') }}" class="nav-link inline-flex items-center gap-1.5 {{ $r==='flashcards.index'?'active text-brand-700':'' }}"><i data-lucide="layers" class="h-4 w-4"></i> Flashcards</a>
-                <a href="{{ route('quiz.index') }}" class="nav-link inline-flex items-center gap-1.5 {{ str_starts_with($r,'quiz')?'active text-brand-700':'' }}"><i data-lucide="clipboard-check" class="h-4 w-4"></i> Quiz</a>
-                <a href="{{ route('library.index') }}" class="nav-link inline-flex items-center gap-1.5 {{ $r==='library.index'?'active text-brand-700':'' }}"><i data-lucide="library-big" class="h-4 w-4"></i> Library</a>
-                <a href="{{ route('progress.index') }}" class="nav-link inline-flex items-center gap-1.5 {{ $r==='progress.index'?'active text-brand-700':'' }}"><i data-lucide="bar-chart-3" class="h-4 w-4"></i> Progress</a>
-                <a href="{{ route('ai.index') }}" class="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-brand-600 to-violet-600 px-4 py-2 text-white shadow-md shadow-brand-500/30 transition hover:shadow-lg hover:shadow-brand-500/40 btn-press">
-                    <i data-lucide="sparkles" class="h-4 w-4"></i> AI Tutor
-                </a>
-            </nav>
+            <div class="flex items-center gap-4">
+                <nav class="hidden items-center gap-7 text-sm font-semibold text-slate-600 md:flex">
+                    @php $r = Route::currentRouteName(); @endphp
+                    <a href="{{ route('home') }}" class="nav-link inline-flex items-center gap-1.5 {{ $r==='home'?'active text-brand-700':'' }}"><i data-lucide="home" class="h-4 w-4"></i> Home</a>
+                    <a href="{{ route('topics.index') }}" class="nav-link inline-flex items-center gap-1.5 {{ str_starts_with($r,'topics')?'active text-brand-700':'' }}"><i data-lucide="book-open" class="h-4 w-4"></i> Topics</a>
+                    <a href="{{ route('flashcards.index') }}" class="nav-link inline-flex items-center gap-1.5 {{ $r==='flashcards.index'?'active text-brand-700':'' }}"><i data-lucide="layers" class="h-4 w-4"></i> Flashcards</a>
+                    <a href="{{ route('quiz.index') }}" class="nav-link inline-flex items-center gap-1.5 {{ str_starts_with($r,'quiz')?'active text-brand-700':'' }}"><i data-lucide="clipboard-check" class="h-4 w-4"></i> Quiz</a>
+                    <a href="{{ route('library.index') }}" class="nav-link inline-flex items-center gap-1.5 {{ $r==='library.index'?'active text-brand-700':'' }}"><i data-lucide="library-big" class="h-4 w-4"></i> Library</a>
+                    <a href="{{ route('progress.index') }}" class="nav-link inline-flex items-center gap-1.5 {{ $r==='progress.index'?'active text-brand-700':'' }}"><i data-lucide="bar-chart-3" class="h-4 w-4"></i> Progress</a>
+                    <a href="{{ route('ai.index') }}" class="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-brand-600 to-violet-600 px-4 py-2 text-white shadow-md shadow-brand-500/30 transition hover:shadow-lg hover:shadow-brand-500/40 btn-press">
+                        <i data-lucide="sparkles" class="h-4 w-4"></i> AI Tutor
+                    </a>
+                </nav>
+
+                <div class="flex items-center gap-2 text-sm font-semibold">
+                    @auth
+                        <span class="hidden text-slate-600 sm:inline">Hi, {{ Auth::user()->name }}</span>
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <button type="submit" class="inline-flex items-center gap-1.5 rounded-full border border-slate-300 px-3.5 py-1.5 text-slate-600 transition hover:bg-slate-100 btn-press">
+                                <i data-lucide="log-out" class="h-4 w-4"></i> Logout
+                            </button>
+                        </form>
+                    @else
+                        <a href="{{ route('login') }}" class="inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-slate-600 transition hover:bg-slate-100">
+                            <i data-lucide="log-in" class="h-4 w-4"></i> Log in
+                        </a>
+                        <a href="{{ route('register') }}" class="inline-flex items-center gap-1.5 rounded-full bg-slate-900 px-3.5 py-1.5 text-white transition hover:bg-slate-700 btn-press">
+                            Sign up
+                        </a>
+                    @endauth
+                </div>
+            </div>
         </div>
     </header>
 
     <main class="pb-20 md:pb-0">
+        @if (session('status'))
+            <div class="mx-auto max-w-6xl px-4 pt-4">
+                <div class="flex items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700">
+                    <i data-lucide="check-circle-2" class="h-4 w-4"></i>
+                    {{ session('status') }}
+                </div>
+            </div>
+        @endif
         @yield('content')
     </main>
 

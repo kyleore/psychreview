@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AiController;
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\FlashcardController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LibraryController;
@@ -26,3 +27,12 @@ Route::post('/library/find-pdfs', [LibraryController::class, 'findPdfs'])->name(
 
 Route::get('/ai-tutor', [AiController::class, 'index'])->name('ai.index');
 Route::post('/ai-tutor/explain', [AiController::class, 'explain'])->name('ai.explain');
+
+// Authentication
+Route::middleware('guest')->group(function () {
+    Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
+    Route::post('/register', [AuthController::class, 'register']);
+    Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
+    Route::post('/login', [AuthController::class, 'login']);
+});
+Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth')->name('logout');

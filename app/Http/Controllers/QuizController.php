@@ -6,6 +6,7 @@ use App\Models\Category;
 use App\Models\QuizAttempt;
 use App\Models\QuizQuestion;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class QuizController extends Controller
 {
@@ -82,6 +83,7 @@ class QuizController extends Controller
         $total = count($results);
 
         QuizAttempt::create([
+            'user_id' => Auth::id(),
             'session_id' => $request->session()->getId(),
             'score' => $score,
             'total' => $total,

@@ -6,5 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class QuizAttempt extends Model
 {
-    protected $fillable = ['session_id', 'score', 'total'];
+    protected $fillable = ['user_id', 'session_id', 'score', 'total'];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

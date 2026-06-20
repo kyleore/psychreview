@@ -852,5 +852,16 @@ class PsychReviewSeeder extends Seeder
                 'explanation' => $t['exp'],
             ]);
         }
+
+        // Built-in demo account so there is always a guaranteed login,
+        // even on a fresh database after a redeploy.
+        \App\Models\User::firstOrCreate(
+            ['email' => 'demo@psychreview.app'],
+            [
+                'name' => 'Demo Student',
+                'password' => 'psychreview123',
+                'onboarded_at' => now(),
+            ]
+        );
     }
 }

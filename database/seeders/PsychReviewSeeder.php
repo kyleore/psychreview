@@ -12,6 +12,13 @@ class PsychReviewSeeder extends Seeder
 {
     public function run(): void
     {
+        // Idempotent: if the content is already seeded, do nothing.
+        // This lets db:seed run safely on every boot without wiping or
+        // duplicating data on a persistent database.
+        if (Category::count() > 0) {
+            return;
+        }
+
         // Categories aligned to the PRC Psychometrician Licensure Exam coverage
         // (Theories of Personality 20%, Psychological Assessment 45%,
         //  Abnormal 20%, Industrial/Organizational 15%) plus foundation subjects.

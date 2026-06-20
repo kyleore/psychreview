@@ -3,7 +3,7 @@ FROM php:8.2-cli
 
 # Install PHP extensions needed by Laravel
 COPY --from=mlocati/php-extension-installer:latest /usr/bin/install-php-extensions /usr/local/bin/
-RUN install-php-extensions pdo_sqlite mbstring bcmath zip exif pcntl gd intl \
+RUN install-php-extensions pdo_sqlite pdo_pgsql pgsql mbstring bcmath zip exif pcntl gd intl \
     && apt-get update \
     && apt-get install -y --no-install-recommends git unzip libzip-dev sqlite3 \
     && rm -rf /var/lib/apt/lists/*

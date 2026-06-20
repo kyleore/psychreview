@@ -166,10 +166,10 @@
                             </button>
                         </form>
                     @else
-                        <a href="{{ route('login') }}" class="inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-slate-600 transition hover:bg-slate-100">
+                        <a href="{{ route('login') }}" class="inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full px-3.5 py-1.5 text-slate-600 transition hover:bg-slate-100">
                             <i data-lucide="log-in" class="h-4 w-4"></i> Log in
                         </a>
-                        <a href="{{ route('register') }}" class="inline-flex items-center gap-1.5 rounded-full bg-slate-900 px-3.5 py-1.5 text-white transition hover:bg-slate-700 btn-press">
+                        <a href="{{ route('register') }}" class="inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full bg-slate-900 px-3.5 py-1.5 text-white transition hover:bg-slate-700 btn-press">
                             Sign up
                         </a>
                     @endauth

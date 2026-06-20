@@ -105,7 +105,7 @@
                         <a href="{{ route('intro') }}" title="App guide" class="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-slate-500 transition hover:bg-slate-100 hover:text-brand-600">
                             <i data-lucide="help-circle" class="h-4 w-4"></i><span class="hidden sm:inline">Guide</span>
                         </a>
-                        <span class="hidden text-slate-600 sm:inline">Hi, {{ Auth::user()->name }}</span>
+                        <span class="hidden max-w-[10rem] truncate whitespace-nowrap text-slate-600 lg:inline">Hi, {{ Auth::user()->name }}</span>
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
                             <button type="submit" class="inline-flex items-center gap-1.5 rounded-full border border-slate-300 px-3.5 py-1.5 text-slate-600 transition hover:bg-slate-100 btn-press">

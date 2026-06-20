@@ -29,9 +29,16 @@
             </div>
             <div>
                 <label for="password" class="mb-1 block text-sm font-semibold text-slate-700">Password</label>
-                <input id="password" name="password" type="password" required
-                    class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-200"
-                    placeholder="••••••••">
+                <div x-data="{ show: false }" class="relative">
+                    <input id="password" name="password" :type="show ? 'text' : 'password'" required
+                        class="w-full rounded-lg border border-slate-300 px-3 py-2.5 pr-11 text-sm outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-200"
+                        placeholder="••••••••">
+                    <button type="button" @click="show = !show" :aria-label="show ? 'Hide password' : 'Show password'"
+                        class="absolute inset-y-0 right-0 flex items-center px-3 text-slate-400 transition hover:text-slate-600">
+                        <i x-show="!show" data-lucide="eye" class="h-5 w-5"></i>
+                        <i x-show="show" x-cloak data-lucide="eye-off" class="h-5 w-5"></i>
+                    </button>
+                </div>
             </div>
             <label class="flex items-center gap-2 text-sm text-slate-600">
                 <input type="checkbox" name="remember" class="rounded border-slate-300 text-brand-600 focus:ring-brand-200">

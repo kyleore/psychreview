@@ -155,6 +155,11 @@
 
                 <div class="flex items-center gap-2 text-sm font-semibold">
                     @auth
+                        @if (Auth::user()->is_admin)
+                            <a href="{{ route('admin.dashboard') }}" title="Admin panel" class="inline-flex items-center gap-1.5 rounded-full bg-amber-100 px-3 py-1.5 text-amber-700 transition hover:bg-amber-200">
+                                <i data-lucide="shield-check" class="h-4 w-4"></i><span class="hidden sm:inline">Admin</span>
+                            </a>
+                        @endif
                         <a href="{{ route('intro') }}" title="App guide" class="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-slate-500 transition hover:bg-slate-100 hover:text-brand-600">
                             <i data-lucide="help-circle" class="h-4 w-4"></i><span class="hidden sm:inline">Guide</span>
                         </a>

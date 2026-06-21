@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AiController;
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\FlashcardController;
 use App\Http\Controllers\HomeController;
@@ -34,6 +35,15 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/ai-tutor', [AiController::class, 'index'])->name('ai.index');
     Route::post('/ai-tutor/explain', [AiController::class, 'explain'])->name('ai.explain');
+});
+
+// Admin panel — monitor users, content and quiz activity.
+Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/', [AdminController::class, 'dashboard'])->name('dashboard');
+    Route::get('/users', [AdminController::class, 'users'])->name('users');
+    Route::get('/users/{user}', [AdminController::class, 'showUser'])->name('users.show');
+    Route::patch('/users/{user}/toggle-admin', [AdminController::class, 'toggleAdmin'])->name('users.toggle-admin');
+    Route::delete('/users/{user}', [AdminController::class, 'destroyUser'])->name('users.destroy');
 });
 
 // Authentication

@@ -12,6 +12,14 @@ class PsychReviewSeeder extends Seeder
 {
     public function run(): void
     {
+        // Grant admin access to the designated accounts. This runs on every
+        // boot (before the idempotent guard below) so admins stay elevated
+        // even on an already-seeded persistent database.
+        \App\Models\User::whereIn('email', [
+            'demo@psychreview.app',
+            'orekyle7@gmail.com',
+        ])->update(['is_admin' => true]);
+
         // Idempotent: if the content is already seeded, do nothing.
         // This lets db:seed run safely on every boot without wiping or
         // duplicating data on a persistent database.
@@ -861,6 +869,7 @@ class PsychReviewSeeder extends Seeder
                 'name' => 'Demo Student',
                 'password' => 'psychreview123',
                 'onboarded_at' => now(),
+                'is_admin' => true,
             ]
         );
     }

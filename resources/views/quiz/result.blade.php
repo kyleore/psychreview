@@ -46,6 +46,24 @@
                     </span>
                     <div class="flex-1">
                         <h3 class="font-bold text-slate-900">{{ $q->question }}</h3>
+                        @auth
+                            @php $lvl = $r['level'] ?? 1; @endphp
+                            <div class="mt-1 flex flex-wrap items-center gap-2">
+                                <span class="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-bold
+                                    {{ $lvl >= 5 ? 'bg-amber-100 text-amber-700' : ($lvl >= 3 ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500') }}">
+                                    <i data-lucide="{{ $lvl >= 5 ? 'crown' : 'star' }}" class="h-3 w-3"></i> Level {{ $lvl }}
+                                </span>
+                                @if(!empty($r['leveled_up']))
+                                    <span class="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-bold text-emerald-600">
+                                        <i data-lucide="arrow-up" class="h-3 w-3"></i> Levelled up!
+                                    </span>
+                                @elseif(($r['level'] ?? 1) < ($r['old_level'] ?? 1))
+                                    <span class="inline-flex items-center gap-1 rounded-full bg-rose-50 px-2 py-0.5 text-[11px] font-bold text-rose-500">
+                                        <i data-lucide="arrow-down" class="h-3 w-3"></i> Levelled down
+                                    </span>
+                                @endif
+                            </div>
+                        @endauth
                         <div class="mt-2 space-y-1.5 text-sm">
                             @foreach($q->options as $idx => $opt)
                                 @php

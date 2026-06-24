@@ -128,8 +128,16 @@
                 <div class="flex items-start gap-3">
                     <span class="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-brand-50 text-sm font-extrabold text-brand-700">{{ $i+1 }}</span>
                     <div class="flex-1">
-                        <div class="flex items-center gap-2 text-[11px] font-bold uppercase tracking-wide text-slate-400">
-                            <i data-lucide="{{ $question->topic->category->icon }}" class="h-3.5 w-3.5"></i> {{ $question->topic->category->name }}
+                        <div class="flex flex-wrap items-center gap-2 text-[11px] font-bold uppercase tracking-wide text-slate-400">
+                            <span class="inline-flex items-center gap-1"><i data-lucide="{{ $question->topic->category->icon }}" class="h-3.5 w-3.5"></i> {{ $question->topic->category->name }}</span>
+                            @auth
+                                @php $lvl = $levels[$question->id] ?? 1; @endphp
+                                <span title="Your mastery level for this question"
+                                      class="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px]
+                                      {{ $lvl >= 5 ? 'bg-amber-100 text-amber-700' : ($lvl >= 3 ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500') }}">
+                                    <i data-lucide="{{ $lvl >= 5 ? 'crown' : 'star' }}" class="h-3 w-3"></i> Lv {{ $lvl }}
+                                </span>
+                            @endauth
                         </div>
                         <h3 class="mt-1 text-lg font-bold text-slate-900">{{ $question->question }}</h3>
                     </div>

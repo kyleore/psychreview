@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
+use App\Models\QuestionProgress;
 use App\Models\QuizAttempt;
 use App\Models\QuizQuestion;
 use App\Models\Topic;
@@ -45,10 +46,21 @@ class QuizController extends Controller
         // mixed "all" quiz — just in a random order each time.
         $questions = $query->inRandomOrder()->get();
 
+        // Each logged-in user has a mastery level per question (1-5). Load it
+        // so the quiz can show how far they've levelled up each question.
+        $levels = [];
+        if (Auth::check()) {
+            $levels = QuestionProgress::where('user_id', Auth::id())
+                ->whereIn('quiz_question_id', $questions->pluck('id'))
+                ->pluck('level', 'quiz_question_id')
+                ->all();
+        }
+
         return view('quiz.index', [
             'mode' => 'quiz',
             'questions' => $questions,
             'category' => $category,
+            'levels' => $levels,
         ]);
     }
 
@@ -66,6 +78,7 @@ class QuizController extends Controller
 
         $results = [];
         $score = 0;
+        $userId = Auth::id();
 
         foreach ($data['answers'] as $questionId => $choice) {
             $question = $questions->get($questionId);
@@ -78,10 +91,36 @@ class QuizController extends Controller
                 $score++;
             }
 
+            // Update this user's mastery level for the question: answering it
+            // correctly levels it up (max 5), getting it wrong drops it by one
+            // (min 1). Guests aren't tracked.
+            $oldLevel = 1;
+            $newLevel = 1;
+            if ($userId) {
+                $progress = QuestionProgress::firstOrNew([
+                    'user_id' => $userId,
+                    'quiz_question_id' => $question->id,
+                ]);
+
+                $oldLevel = $progress->exists ? (int) $progress->level : 1;
+                $newLevel = $isCorrect
+                    ? min($oldLevel + 1, QuestionProgress::MAX_LEVEL)
+                    : max($oldLevel - 1, 1);
+
+                $progress->level = $newLevel;
+                $progress->attempts = (int) $progress->attempts + 1;
+                $progress->correct_count = (int) $progress->correct_count + ($isCorrect ? 1 : 0);
+                $progress->last_answered_at = now();
+                $progress->save();
+            }
+
             $results[] = [
                 'question' => $question,
                 'choice' => $choice,
                 'correct' => $isCorrect,
+                'old_level' => $oldLevel,
+                'level' => $newLevel,
+                'leveled_up' => $newLevel > $oldLevel,
             ];
         }
 

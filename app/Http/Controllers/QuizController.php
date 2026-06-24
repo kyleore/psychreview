@@ -41,7 +41,14 @@ class QuizController extends Controller
             $query->whereHas('topic', fn ($q) => $q->where('category_id', $category->id));
         }
 
-        $questions = $query->inRandomOrder()->take(10)->get();
+        // A single category shows ALL its questions; the mixed quiz pulls a
+        // random sample so it stays a reasonable length.
+        $query->inRandomOrder();
+        if (! $category) {
+            $query->take(15);
+        }
+
+        $questions = $query->get();
 
         return view('quiz.index', [
             'mode' => 'quiz',

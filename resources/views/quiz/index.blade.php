@@ -135,11 +135,11 @@
                     </div>
                 </div>
                 <div class="mt-4 grid gap-2.5 sm:pl-11">
-                    @foreach($question->options as $idx => $option)
+                    @foreach(collect($question->options)->map(fn($opt, $i) => ['i' => $i, 'text' => $opt])->shuffle() as $pos => $entry)
                         <label class="group flex cursor-pointer items-center gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3 transition hover:border-brand-300 hover:bg-brand-50/50 has-[:checked]:border-brand-500 has-[:checked]:bg-brand-50 has-[:checked]:ring-1 has-[:checked]:ring-brand-400">
-                            <input type="radio" name="answers[{{ $question->id }}]" value="{{ $idx }}" class="peer sr-only" @change="syncCount">
-                            <span class="grid h-6 w-6 shrink-0 place-items-center rounded-full border-2 border-slate-300 text-xs font-bold text-slate-400 transition peer-checked:border-brand-600 peer-checked:bg-brand-600 peer-checked:text-white">{{ chr(65+$idx) }}</span>
-                            <span class="text-sm font-medium text-slate-700">{{ $option }}</span>
+                            <input type="radio" name="answers[{{ $question->id }}]" value="{{ $entry['i'] }}" class="peer sr-only" @change="syncCount">
+                            <span class="grid h-6 w-6 shrink-0 place-items-center rounded-full border-2 border-slate-300 text-xs font-bold text-slate-400 transition peer-checked:border-brand-600 peer-checked:bg-brand-600 peer-checked:text-white">{{ chr(65+$pos) }}</span>
+                            <span class="text-sm font-medium text-slate-700">{{ $entry['text'] }}</span>
                         </label>
                     @endforeach
                 </div>

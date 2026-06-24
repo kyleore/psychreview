@@ -14,6 +14,48 @@
         <p class="mt-2 text-slate-500">Choose a topic to start a focused quiz, or take a mixed quiz across all topics.</p>
     </div>
 
+    @if(session('status'))
+        <div class="mt-6 flex items-center gap-2 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700">
+            <i data-lucide="check-circle-2" class="h-4 w-4"></i> {{ session('status') }}
+        </div>
+    @endif
+    @if(session('quiz_error'))
+        <div class="mt-6 flex items-center gap-2 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-medium text-amber-700">
+            <i data-lucide="alert-triangle" class="h-4 w-4"></i> {{ session('quiz_error') }}
+        </div>
+    @endif
+
+    @auth
+        @if(auth()->user()->is_admin)
+        <div class="mt-6 rounded-3xl border border-brand-100 bg-brand-50/60 p-5">
+            <div class="flex items-center gap-2 text-sm font-bold text-brand-700">
+                <i data-lucide="sparkles" class="h-4 w-4"></i> Generate new questions with AI
+            </div>
+            <p class="mt-1 text-xs text-slate-500">Pick a category and how many questions to add. New questions are saved to the quiz pool for everyone.</p>
+            <form method="POST" action="{{ route('quiz.generate') }}" data-no-skeleton x-data="{ loading:false }" @submit="loading=true" class="mt-3 flex flex-wrap items-center gap-2">
+                @csrf
+                <select name="category" required class="rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-200">
+                    <option value="" disabled selected>Choose a category…</option>
+                    @foreach($categories as $cat)
+                        <option value="{{ $cat->slug }}">{{ $cat->name }}</option>
+                    @endforeach
+                </select>
+                <select name="count" class="rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-200">
+                    <option value="3">3 questions</option>
+                    <option value="5" selected>5 questions</option>
+                    <option value="10">10 questions</option>
+                </select>
+                <button type="submit" :disabled="loading"
+                        class="btn-press inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-brand-600 to-violet-600 px-4 py-2 text-sm font-bold text-white shadow-md shadow-brand-500/30 transition hover:shadow-lg disabled:opacity-60">
+                    <i data-lucide="wand-sparkles" class="h-4 w-4" x-show="!loading"></i>
+                    <svg x-show="loading" x-cloak class="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path></svg>
+                    <span x-text="loading ? 'Generating…' : 'Generate'"></span>
+                </button>
+            </form>
+        </div>
+        @endif
+    @endauth
+
     <!-- Mixed quiz (all topics) -->
     <a href="{{ route('quiz.index', ['category' => 'all']) }}"
        class="lift mt-8 flex items-center justify-between gap-4 rounded-3xl bg-gradient-to-r from-brand-600 to-violet-600 p-6 text-white shadow-xl shadow-brand-500/30">

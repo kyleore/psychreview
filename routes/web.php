@@ -27,6 +27,7 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/quiz', [QuizController::class, 'index'])->name('quiz.index');
     Route::post('/quiz', [QuizController::class, 'submit'])->name('quiz.submit');
+    Route::post('/quiz/generate', [QuizController::class, 'generate'])->middleware('admin')->name('quiz.generate');
 
     Route::get('/progress', [ProgressController::class, 'index'])->name('progress.index');
 

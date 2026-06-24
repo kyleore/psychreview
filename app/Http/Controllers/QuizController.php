@@ -119,47 +119,76 @@ class QuizController extends Controller
             return back()->with('quiz_error', "This category has no topics to attach questions to yet.");
         }
 
-        $generated = $this->generateQuestionsWithAi($category->name, $count);
-
-        if (empty($generated)) {
-            return back()->with('quiz_error', "The AI couldn't generate questions right now (it may be busy). Please try again in a moment.");
-        }
-
-        // Skip anything we already have, comparing on the question text.
+        // Everything we already have for this category (lowercased) so we can
+        // detect repeats and tell the AI what NOT to reuse.
         $existing = QuizQuestion::whereIn('topic_id', $topics->pluck('id'))
             ->pluck('question')
             ->map(fn ($q) => mb_strtolower(trim($q)))
             ->flip();
 
         $added = 0;
-        foreach ($generated as $item) {
-            if ($existing->has(mb_strtolower(trim($item['question'])))) {
-                continue;
+        $reachedAi = false;
+
+        // Keep asking the AI until we've saved `count` brand-new questions.
+        // If a generated question repeats one we already have, we simply
+        // regenerate more until the batch is filled (capped attempts so we
+        // never loop forever or burn through API quota).
+        for ($attempt = 0; $attempt < 4 && $added < $count; $attempt++) {
+            $needed = $count - $added;
+
+            $avoid = $existing->keys()->take(40)->all();
+            $generated = $this->generateQuestionsWithAi($category->name, $needed, $avoid);
+
+            if (! empty($generated)) {
+                $reachedAi = true;
             }
 
-            QuizQuestion::create([
-                'topic_id' => $topics->random()->id,
-                'question' => $item['question'],
-                'options' => $item['options'],
-                'correct_index' => $item['correct_index'],
-                'explanation' => $item['explanation'],
-            ]);
-            $added++;
+            foreach ($generated as $item) {
+                if ($added >= $count) {
+                    break;
+                }
+
+                $key = mb_strtolower(trim($item['question']));
+                if ($existing->has($key)) {
+                    continue; // repeated question -> skip, loop will regenerate
+                }
+
+                QuizQuestion::create([
+                    'topic_id' => $topics->random()->id,
+                    'question' => $item['question'],
+                    'options' => $item['options'],
+                    'correct_index' => $item['correct_index'],
+                    'explanation' => $item['explanation'],
+                ]);
+
+                $existing->put($key, true); // remember it for the next round
+                $added++;
+            }
+        }
+
+        if (! $reachedAi) {
+            return back()->with('quiz_error', "The AI couldn't generate questions right now (it may be busy). Please try again in a moment.");
         }
 
         if ($added === 0) {
-            return back()->with('quiz_error', 'No new questions were added (the AI returned ones we already have). Try again.');
+            return back()->with('quiz_error', 'No new questions could be added — the AI kept repeating ones we already have. Try again.');
         }
 
-        return back()->with('status', "Added {$added} new AI ".Str::plural('question', $added)." to {$category->name}.");
+        $note = $added < $count
+            ? "Added {$added} new AI ".Str::plural('question', $added)." to {$category->name} (some repeats were skipped — try again for more)."
+            : "Added {$added} new AI ".Str::plural('question', $added)." to {$category->name}.";
+
+        return back()->with('status', $note);
     }
 
     /**
      * Ask the AI for board-exam multiple-choice questions and return a
      * validated array of [question, options[], correct_index, explanation].
      * Tries Gemini first, then Groq. Returns [] if both fail.
+     *
+     * @param  array<int, string>  $avoid  Existing question texts the AI must not repeat.
      */
-    private function generateQuestionsWithAi(string $subject, int $count): array
+    private function generateQuestionsWithAi(string $subject, int $count, array $avoid = []): array
     {
         $prompt = "Generate {$count} multiple-choice review questions about \"{$subject}\" "
             .'for the PRC Psychometrician Licensure Exam (RA 10029) in the Philippines. '
@@ -168,6 +197,12 @@ class QuizController extends Controller
             .'Return ONLY a valid JSON array (no markdown, no commentary) where each element is an object: '
             .'{"question": string, "options": [string, string, string, string], '
             .'"correct_index": integer 0-3, "explanation": short string why the answer is correct}.';
+
+        if (! empty($avoid)) {
+            $list = collect($avoid)->take(40)->map(fn ($q) => '- '.$q)->implode("\n");
+            $prompt .= "\n\nIMPORTANT: Do NOT repeat or paraphrase any of these existing questions. "
+                ."Create completely different ones:\n".$list;
+        }
 
         $raw = $this->askGeminiJson($prompt) ?? $this->askGroqJson($prompt);
 
